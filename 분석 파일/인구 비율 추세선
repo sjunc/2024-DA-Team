@@ -1,0 +1,139 @@
+# 전국 인구 비율
+
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import csv
+
+# 데이터 불러오기
+flie_path =r'C:\Users\park4\Desktop\35/1996~2023연령별_인구변화_전체.csv'
+data = pd.read_csv(flie_path, encoding= 'euc-kr')
+
+# '총인구수(명)' 데이터 필터링
+total_population = data[data['항목'] == '총인구(명)']
+
+# 2013년부터 2023년까지의 데이터 추출
+years = [2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023]
+population_values = total_population[years].iloc[0].astype(float) # 값을 숫자로 변환
+
+# 추세선 계산
+x = np.arange(len(years)) # 연도를 숫자로 표현
+z = np.polyfit(x, population_values, 1) # 1차 다항식 (선형 회귀)
+p = np.poly1d(z)
+
+# 시각화
+plt.figure(figsize=(10, 6))
+plt.plot(years, population_values, 'o', label='실제 총인구', color='blue')
+plt.plot(years, p(x), '--', label='추세선', color='red')
+
+#그래프 꾸미기
+plt.title('2013년~2023년 총인구와 추세선', fontsize = 16)
+plt.xlabel('연도', fontsize=12)
+plt.ylabel('전국 총인구 (명)', fontsize=12)
+plt.xticks(rotation=45)
+plt.legend()
+plt.grid(True)
+plt.show()
+
+이 데이터에 따르면 코로나 시기인 2019년부터 인구가 점점 감소하는 것을 볼 수가 있다
+
+## 연령별 인구 비율
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 파일 경로 설정
+file_path = r'C:\Users\park4\Desktop\35변\1996~2023연령별_인구변화_전체.csv'
+
+# 데이터 불러오기
+data = pd.read_csv(file_path, encoding='euc-kr')
+
+# 연도 범위 설정
+years = [f"{year}년" for year in range(2013, 2024)]  # 2013년~2023년
+x = np.arange(len(years))  # 연도를 숫자로 변환
+
+# 그래프 설정
+plt.figure(figsize=(12, 8))
+plt.title('2013년~2023년 연령대별 인구수 추세선', fontsize=16)
+plt.xlabel('연도', fontsize=12)
+plt.ylabel('인구수 (명)', fontsize=12)
+
+# 연령대별 추세선 계산 및 시각화
+age_groups = data['항목'].unique()  # 연령대 목록 추출
+for group in age_groups:
+    if group == '총인구수(명)':  # 총인구수는 제외
+        continue
+    
+    # 연령대 데이터 추출
+    group_data = data[data['항목'] == group]
+    group_values = group_data[years].iloc[0].astype(float)
+    
+    # 추세선 계산
+    z = np.polyfit(x, group_values, 1)  # 1차 다항식 (선형 회귀)
+    p = np.poly1d(z)
+    
+    # 그래프 그리기
+    plt.plot(years, group_values, 'o-', label=f'{group} (실제값)', alpha=0.7)
+    plt.plot(years, p(x), '--', label=f'{group} (추세선)', alpha=0.7)
+
+# 그래프 꾸미기
+plt.xticks(rotation=45)
+plt.legend(fontsize=9, loc='upper left', bbox_to_anchor=(1.05, 1))
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+## 지역별 인구 비율
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 파일 경로 설정
+file_path = r'C:\Users\park4\Desktop\35변\지역별_인구변화.csv'  # 파일 경로를 알맞게 수정
+
+# 데이터 불러오기
+data = pd.read_csv(file_path, encoding='euc-kr')
+
+# 연도 범위 설정
+years = [f"{year}년" for year in range(2013, 2024)]  # 2013년~2023년
+x = np.arange(len(years))  # 연도를 숫자로 변환
+
+# 전체 인구 데이터 추출
+total_population = data[data['항목'] == '총인구수(명)'][years].iloc[0].astype(float)
+
+# 그래프 설정
+plt.figure(figsize=(14, 10))
+plt.title('2013년~2023년 지역별 인구 비율 추세선', fontsize=16)
+plt.xlabel('연도', fontsize=12)
+plt.ylabel('인구 비율 (%)', fontsize=12)
+
+# 지역별 인구 비율 추세선 계산 및 시각화
+regions = data['항목'].unique()
+for region in regions:
+    if region == '총인구수(명)':  # 총인구 데이터는 제외
+        continue
+    
+    # 지역 데이터 추출
+    region_data = data[data['항목'] == region]
+    region_values = region_data[years].iloc[0].astype(float)
+    
+    # 인구 비율 계산
+    region_ratio = (region_values / total_population) * 100  # 비율 계산 (백분율)
+    
+    # 추세선 계산
+    z = np.polyfit(x, region_ratio, 1)  # 1차 다항식 (선형 회귀)
+    p = np.poly1d(z)
+    
+    # 그래프 그리기
+    plt.plot(years, region_ratio, 'o-', label=f'{region} (실제값)', alpha=0.7)
+    plt.plot(years, p(x), '--', label=f'{region} (추세선)', alpha=0.7)
+
+# 그래프 꾸미기
+plt.xticks(rotation=45)
+plt.legend(fontsize=9, loc='upper left', bbox_to_anchor=(1.05, 1))
+plt.grid(True)
+plt.tight_layout()
+plt.show()
